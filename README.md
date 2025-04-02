@@ -17,6 +17,8 @@ Paper link: upcoming...
 
 We are currently organizing and preparing to open-source the code related to Diff-Holo's training, algorithm architecture, and other engineering aspects.
 
+---
+
 ## Contact
 
 If you have any questions or suggestions regarding this project or the research paper, please feel free to contact the author, Ziqi Bai, at 21B951029@stu.hit.edu.cn.
