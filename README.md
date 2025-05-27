@@ -47,7 +47,7 @@ CUDA_VISIBLE_DEVICES=0,1 torchrun --standalone --nproc_per_node=2 --nnodes=1 mai
 
 ## Citation
 
-If you find HoloFormer useful in your research, please consider citing:
+If you find Diff-Holo useful in your research, please consider citing:
 
 ```
 @ARTICLE{10966195,
