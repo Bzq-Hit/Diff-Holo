@@ -1,0 +1,91 @@
+trainer:
+  target: trainer.TrainerDifIR
+
+model:
+  target: models.unet.ComplexUformer # HoloFormer v2
+  ckpt_path: ~
+  params:
+    image_size: 256
+    in_chans: 1
+    dd_in: 1
+    embed_dim: 32 # base
+    depths: [1, 2, 8, 8, 2, 8, 8, 2, 1]
+    num_heads: [1, 2, 4, 8, 16, 16, 8, 4, 2]
+    win_size: 8
+    mlp_ratio: 4
+    qkv_bias: True
+    drop_rate: 0.
+    attn_drop_rate: 0.
+    drop_path_rate: 0.1
+    patch_norm: True
+    use_checkpoint: False
+    shift_flag: True
+    cond_lq: True
+
+autoencoder: 
+
+diffusion:
+  target: models.script_util.create_gaussian_diffusion
+  params:
+    schedule_name: exponential
+    schedule_kwargs:
+      power: 0.3 
+    etas_end: 0.99
+    steps: 15 
+    min_noise_level: 0.04
+    kappa: 2.0 
+    weighted_mse: False
+    predict_type: xstart
+    timestep_respacing: ~
+    scale_factor: 1.0
+    normalize_input: False
+
+data:
+  train:
+    type: holo_inverse
+    params:
+      dir_paths: /home/zx/Desktop/bzq_exp/lensless/dataset_23.4.26_inverse_realnimag_cleanpatch # Change to your own data path
+      mode: train
+
+  val:
+    type: holo_inverse
+    params:
+      dir_paths: /home/zx/Desktop/bzq_exp/lensless/dataset_23.4.26_inverse_realnimag_cleanpatch # Change to your own data path
+      mode: val
+  
+train:
+  # learning rate
+  lr: 5e-5                      # learning rate 
+  lr_min: 2e-5                      # learning rate 
+  lr_schedule: ~
+  warmup_iterations: 5000
+  # dataloader     
+  batch: [4, 1]                
+  microbatch: 2
+  num_workers: 4
+  prefetch_factor: 2            
+  # optimization settings
+  weight_decay: 0               
+  ema_rate: 0.999
+  iterations: 600000        # total iterations        
+  # save logging      
+  save_freq: 10000 
+  log_freq: [200, 2000, 1]         # [training loss, training images, val images]
+
+  local_logging: True           # manually save images
+  tf_logging: False             # tensorboard logging
+  # validation settings
+  use_ema_val: True            
+  val_freq: 10000
+
+  val_y_channel: False
+  val_resolution: ${model.params.lq_size}
+  val_padding_mode: reflect
+  # training setting
+  use_amp: True                # amp training
+  seed: 123456                 # random seed
+  global_seeding: False
+  # model compile
+  compile:
+    flag: False
+    mode: reduce-overhead      # default, reduce-overhead
